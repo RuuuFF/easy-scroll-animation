@@ -1,5 +1,5 @@
 /**
- * ==== DEFAULT TRANSITION ====
+ * ==== DEFAULT ANIMATION OPTIONS ====
  * duration: 0.4
  * timing: 'ease'
  * delay: 0
@@ -25,7 +25,7 @@ const Animations = [
   {
     selector: '.box:is(.one, .three, .five, .seven)',
     initial: [
-      { opacity: 0, timing: 'ease-in-out' },
+      { opacity: 0, timing: 'ease' },
       { transform: 'translate(-40px, 40px)', duration: 0.6, timing: 'ease-in' },
     ],
     final: [
@@ -67,10 +67,34 @@ const ScrollAnimation = {
     styleEl.insertAdjacentHTML("beforebegin", "<!-- Style injected by Easy Scroll Animation (github.com/ruuuff/easy-scroll-animation) -->")
   },
 
-  getTransitionValues() {
-    const duration = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.duration !== 'undefined') ? AnimationOptions.duration : 0.4
-    const timing = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.timing !== 'undefined') ? AnimationOptions.timing : 'ease'
-    const delay = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.delay !== 'undefined') ? AnimationOptions.delay : 0
+  getTransitionValues(props) {
+    let duration, timing, delay;
+
+    if (props.duration) {
+      duration = props.duration
+    } else if (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.duration !== 'undefined') {
+      duration = AnimationOptions.duration
+    } else {
+      duration = 0.4
+    }
+
+    if (props.timing) {
+      timing = props.timing
+    } else if (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.timing !== 'undefined') {
+      timing = AnimationOptions.timing
+    } else {
+      timing = 'ease'
+    }
+
+    if (props.delay) {
+      delay = props.delay
+    } else if (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.delay !== 'undefined') {
+      delay = AnimationOptions.delay
+    } else {
+      delay = 0
+    }
+
+    console.log(duration, timing, delay)
 
     return { duration, timing, delay }
   },
@@ -82,7 +106,8 @@ const ScrollAnimation = {
     for (let [index, props] of initial.entries()) {
       const prop = Object.keys(props)[0]
       const value = props[Object.keys(props)[0]]
-      const { duration, timing, delay } = this.getTransitionValues()
+
+      const { duration, timing, delay } = this.getTransitionValues(props)
 
       style.insertAdjacentHTML("beforeend", `  ${prop}: ${value};`)
 
