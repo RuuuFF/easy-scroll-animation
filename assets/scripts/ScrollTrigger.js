@@ -1,13 +1,22 @@
+/**
+ * ==== DEFAULT OPTIONS ====
+ * desktop: 70   (screen height percentage)
+ * mobile: 80   (screen height percentage)
+ * remake: true   (repetition of the animation on going up and down again )
+ */
+
 const Options = {}
 
 const ScrollTrigger = {
   nodes: [],
 
   getNodes() {
-    const stringSelectors = document.querySelector('head #scroll-animation').innerText
-    const selectors = stringSelectors.substring(
-      stringSelectors.indexOf("/*") + 2,
-      stringSelectors.lastIndexOf("*/")
+    const styleEl = document.querySelector('head style#easy-scroll-animation')
+    const CSSCodeString = styleEl.innerText
+
+    const selectors = CSSCodeString.substring(
+      CSSCodeString.indexOf("/*") + 2,
+      CSSCodeString.lastIndexOf("*/")
     ).split('$')
 
     for (let selector of selectors) {
@@ -25,11 +34,7 @@ const ScrollTrigger = {
   },
 
   animationRemake() {
-    if (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') {
-      return Options.remake
-    } else {
-      return true
-    }
+    return (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') ? Options.remake : true
   },
 
   checkNodes() {
