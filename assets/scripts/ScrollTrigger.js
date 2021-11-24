@@ -1,47 +1,58 @@
 const Options = {}
 
-const string = document.querySelector('head #scroll-animation').innerText
+const ScrollTrigger = {
+  nodes: [],
 
-const selectors = string.substring(
-  string.indexOf("/*") + 2,
-  string.lastIndexOf("*/")
-).split('$')
+  getNodes() {
+    const stringSelectors = document.querySelector('head #scroll-animation').innerText
+    const selectors = stringSelectors.substring(
+      stringSelectors.indexOf("/*") + 2,
+      stringSelectors.lastIndexOf("*/")
+    ).split('$')
 
-const nodes = []
-
-for (let selector of selectors) {
-  const nodeList = document.querySelectorAll(selector.trim())
-  nodeList.forEach(node => nodes.push(node))
-}
-
-const checkNodes = () => {
-  let percentage
-  let remake
-
-  if (window.innerWidth > 480) {
-    percentage = (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
-  } else {
-    percentage = (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
-  }
-
-  if (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') {
-    remake = Options.remake
-  } else {
-    remake = true
-  }
-
-  const trigger = window.innerHeight * percentage / 100
-
-  for (let node of nodes) {
-    const elTop = node.getBoundingClientRect().top
-
-    if (elTop < trigger) {
-      node.classList.add('animate')
-    } else if (remake) {
-      node.classList.remove('animate')
+    for (let selector of selectors) {
+      const nodeList = document.querySelectorAll(selector.trim())
+      nodeList.forEach(node => this.nodes.push(node))
     }
+  },
+
+  screenPercentage() {
+    if (window.innerWidth > 480) {
+      return (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
+    } else {
+      return (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
+    }
+  },
+
+  animationRemake() {
+    if (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') {
+      return Options.remake
+    } else {
+      return true
+    }
+  },
+
+  checkNodes() {
+    const percentage = this.screenPercentage()
+    const remake = this.animationRemake()
+    const trigger = window.innerHeight * percentage / 100
+
+    for (let node of this.nodes) {
+      const elTop = node.getBoundingClientRect().top
+
+      if (elTop < trigger) {
+        node.classList.add('animate')
+      } else if (remake) {
+        node.classList.remove('animate')
+      }
+    }
+  },
+
+  start() {
+    this.getNodes()
+    this.checkNodes()
+    window.onscroll = () => this.checkNodes()
   }
 }
 
-window.onscroll = () => checkNodes()
-checkNodes()
+window.onload = () => ScrollTrigger.start()
