@@ -7,6 +7,8 @@
  * Use :is() for multiple selectors with the same animation
  */
 
+const AnimationOptions = {}
+
 const Animations = [
   {
     selector: 'h1',
@@ -65,6 +67,14 @@ const ScrollAnimation = {
     styleEl.insertAdjacentHTML("beforebegin", "<!-- Style injected by Easy Scroll Animation (github.com/ruuuff/easy-scroll-animation) -->")
   },
 
+  getTransitionValues() {
+    const duration = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.duration !== 'undefined') ? AnimationOptions.duration : 0.4
+    const timing = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.timing !== 'undefined') ? AnimationOptions.timing : 'ease'
+    const delay = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.delay !== 'undefined') ? AnimationOptions.delay : 0
+
+    return { duration, timing, delay }
+  },
+
   initialStyle(style, initial, selector) {
     let transitions = ''
     style.insertAdjacentHTML("beforeend", `${selector} {`)
@@ -72,7 +82,7 @@ const ScrollAnimation = {
     for (let [index, props] of initial.entries()) {
       const prop = Object.keys(props)[0]
       const value = props[Object.keys(props)[0]]
-      const { duration = 0.4, timing = 'ease', delay = 0 } = props
+      const { duration, timing, delay } = this.getTransitionValues()
 
       style.insertAdjacentHTML("beforeend", `  ${prop}: ${value};`)
 
