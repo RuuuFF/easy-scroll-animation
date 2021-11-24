@@ -1,5 +1,5 @@
 /**
- * ==== DEFAULT OPTIONS ====
+ * ==== DEFAULT TRIGGER OPTIONS ====
  * desktop: 70   (screen height percentage)
  * mobile: 80   (screen height percentage)
  * remake: true   (repetition of the animation on going up and down again )
