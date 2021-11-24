@@ -5,7 +5,7 @@
  * remake: true   (repetition of the animation on going up and down again )
  */
 
-const Options = {}
+const TriggerOptions = {}
 
 const ScrollTrigger = {
   nodes: [],
@@ -27,14 +27,14 @@ const ScrollTrigger = {
 
   screenPercentage() {
     if (window.innerWidth > 480) {
-      return (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
+      return (typeof TriggerOptions !== 'undefined' && typeof TriggerOptions.desktop !== 'undefined') ? TriggerOptions.desktop : 70
     } else {
-      return (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
+      return (typeof TriggerOptions !== 'undefined' && typeof TriggerOptions.mobile !== 'undefined') ? TriggerOptions.mobile : 80
     }
   },
 
   animationRemake() {
-    return (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') ? Options.remake : true
+    return (typeof TriggerOptions !== 'undefined' && typeof TriggerOptions.remake !== 'undefined') ? TriggerOptions.remake : true
   },
 
   checkNodes() {
