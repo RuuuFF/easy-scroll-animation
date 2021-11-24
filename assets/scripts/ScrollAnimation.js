@@ -1,6 +1,6 @@
 /**
  * ==== DEFAULT ANIMATION OPTIONS ====
- * duration: 0.4
+ * duration: 0.6
  * timing: 'ease'
  * delay: 0
  * 
@@ -13,8 +13,8 @@ const Animations = [
   {
     selector: 'h1',
     initial: [
-      { opacity: 0, duration: 1 },
-      { transform: 'scale(0.8)', duration: 0.8 },
+      { opacity: 0, duration: 0.8, delay: 0.8 },
+      { transform: 'scale(0.8)', duration: 0.8, delay: 0.8 },
     ],
     final: [
       { opacity: 1 },
@@ -26,7 +26,7 @@ const Animations = [
     selector: '.box:is(.one, .three, .five, .seven)',
     initial: [
       { opacity: 0, timing: 'ease' },
-      { transform: 'translate(-40px, 40px)', duration: 0.6, timing: 'ease-in' },
+      { transform: 'translate(-40px, 40px)', timing: 'linear' },
     ],
     final: [
       { opacity: 1 },
@@ -38,7 +38,7 @@ const Animations = [
     selector: '.box:is(.two, .four, .six, .eight)',
     initial: [
       { opacity: 0 },
-      { transform: 'translate(40px, 40px)', duration: 0.6, timing: 'ease-in' },
+      { transform: 'translate(40px, 40px)' },
     ],
     final: [
       { opacity: 1 },
@@ -49,8 +49,8 @@ const Animations = [
   {
     selector: '.box:is(.nine, .ten)',
     initial: [
-      { opacity: 0, duration: 0.6 },
-      { transform: 'translate(0, 50px) scaleX(0.5)', duration: 0.6 },
+      { opacity: 0, duration: 0.8 },
+      { transform: 'translate(0, 50px) scaleX(0.5)', duration: 0.8 },
     ],
     final: [
       { opacity: 1 },
@@ -72,29 +72,21 @@ const ScrollAnimation = {
 
     if (props.duration) {
       duration = props.duration
-    } else if (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.duration !== 'undefined') {
-      duration = AnimationOptions.duration
     } else {
-      duration = 0.4
+      duration = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.duration !== 'undefined') ? AnimationOptions.duration : 0.6
     }
 
     if (props.timing) {
       timing = props.timing
-    } else if (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.timing !== 'undefined') {
-      timing = AnimationOptions.timing
     } else {
-      timing = 'ease'
+      timing = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.timing !== 'undefined') ? AnimationOptions.timing : 'ease'
     }
 
     if (props.delay) {
       delay = props.delay
-    } else if (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.delay !== 'undefined') {
-      delay = AnimationOptions.delay
     } else {
-      delay = 0
+      delay = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.delay !== 'undefined') ? AnimationOptions.delay : 0
     }
-
-    console.log(duration, timing, delay)
 
     return { duration, timing, delay }
   },
