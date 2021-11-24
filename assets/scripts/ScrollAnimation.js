@@ -1,15 +1,30 @@
 const Animations = [
   {
+    selector: 'h1',
+    declaration: {
+      initial: [
+        {
+          opacity: 0,
+          transition: { duration: 1, timing: 'ease' }
+        }
+      ],
+      final: [
+        { opacity: 1 }
+      ]
+    }
+  },
+
+  {
     selector: '.box:is(.one, .three, .five, .seven)',
     declaration: {
       initial: [
         {
           opacity: 0,
-          transition: { duration: 0.4, timing: 'ease', delay: 0 }
+          transition: { duration: 0.4, timing: 'ease' }
         },
         {
           transform: 'translate(-40px, 40px)',
-          transition: { duration: 0.6, timing: 'ease-in', delay: 0 }
+          transition: { duration: 0.6, timing: 'ease-in' }
         },
       ],
 
@@ -26,11 +41,11 @@ const Animations = [
       initial: [
         {
           opacity: 0,
-          transition: { duration: 0.4, timing: 'ease', delay: 0 }
+          transition: { duration: 0.4, timing: 'ease' }
         },
         {
           transform: 'translate(40px, 40px)',
-          transition: { duration: 0.6, timing: 'ease-in', delay: 0 }
+          transition: { duration: 0.6, timing: 'ease-in' }
         },
       ],
 
@@ -47,15 +62,15 @@ const Animations = [
       initial: [
         {
           opacity: 0,
-          transition: { duration: 0.6, timing: 'ease', delay: 0 }
+          transition: { duration: 0.6, timing: 'ease' }
         },
         {
           width: '60%',
-          transition: { duration: 0.6, timing: 'ease-in', delay: 0 }
+          transition: { duration: 0.6, timing: 'ease-in' }
         },
         {
           transform: 'translate(0, 50px)',
-          transition: { duration: 0.6, timing: 'ease-in', delay: 0 }
+          transition: { duration: 0.6, timing: 'ease-in' }
         },
       ],
 
@@ -86,7 +101,7 @@ const ScrollAnimation = {
       style.insertAdjacentHTML("beforeend", `  ${prop}: ${value};`)
 
       if (props['transition']) {
-        const { duration, timing, delay } = props['transition']
+        const { duration, timing, delay = 0 } = props['transition']
 
         if (index === initial.length - 1) {
           transition += `${prop} ${duration}s ${timing} ${delay}s;`
@@ -119,13 +134,11 @@ const ScrollAnimation = {
     let selectors = ''
 
     for (let [index, { selector, declaration }] of Animations.entries()) {
-      const lastSelector = index === Animations.length - 1
-      selectors += lastSelector ? `${selector}` : `${selector} $ `
-
       const { initial, final } = declaration
+      const lastSelector = index === Animations.length - 1
 
+      selectors += lastSelector ? `${selector}` : `${selector} $ `
       this.initialStyle(style, initial, selector)
-
       if (final !== undefined && final.length !== 0) {
         this.finalStyle(style, final, selector)
       }
