@@ -1,20 +1,23 @@
 /**
- * ==== DEFAULT ANIMATION OPTIONS ====
+ * ====== DEFAULT ANIMATION OPTIONS ======
  * duration: 0.6
  * timing: 'ease'
  * delay: 0
+ * desktop: 70   (screen height percentage)
+ * mobile: 80   (screen height percentage)
+ * remake: true   (repetition of the animation on going up and down again)
  * 
  * Use :is() for multiple selectors with the same animation
  */
 
-const AnimationOptions = {}
+const Options = {}
 
 const Animations = [
   {
     selector: 'h1',
     initial: [
-      { opacity: 0, duration: 0.8, delay: 0.8 },
-      { transform: 'scale(0.8)', duration: 0.8, delay: 0.8 },
+      { opacity: 0, duration: 0.8 },
+      { transform: 'scale(0.8)', duration: 0.8 },
     ],
     final: [
       { opacity: 1 },
@@ -25,8 +28,8 @@ const Animations = [
   {
     selector: '.box:is(.one, .three, .five, .seven)',
     initial: [
-      { opacity: 0, timing: 'ease' },
-      { transform: 'translate(-40px, 40px)', timing: 'linear' },
+      { opacity: 0, timing: 'linear' },
+      { transform: 'translate(-40px, 40px)', timing: 'ease-in' },
     ],
     final: [
       { opacity: 1 },
@@ -37,8 +40,8 @@ const Animations = [
   {
     selector: '.box:is(.two, .four, .six, .eight)',
     initial: [
-      { opacity: 0 },
-      { transform: 'translate(40px, 40px)' },
+      { opacity: 0, timing: 'linear' },
+      { transform: 'translate(40px, 40px)', timing: 'ease-out' },
     ],
     final: [
       { opacity: 1 },
@@ -61,10 +64,14 @@ const Animations = [
 
 const ScrollAnimation = {
   createStyleEl() {
-    const styleEl = document.createElement("style")
-    styleEl.setAttribute("id", "easy-scroll-animation")
-    document.querySelector("head").appendChild(styleEl)
-    styleEl.insertAdjacentHTML("beforebegin", "<!-- Style injected by Easy Scroll Animation (github.com/ruuuff/easy-scroll-animation) -->")
+    this.styleEl = document.createElement("style")
+    this.styleEl.setAttribute("id", "easy-scroll-animation")
+    document.head.appendChild(this.styleEl)
+    this.styleEl.insertAdjacentHTML("beforebegin", "<!-- Style injected by Easy Scroll Animation (github.com/ruuuff/easy-scroll-animation) -->")
+  },
+
+  setStyle(style) {
+    this.styleEl.insertAdjacentHTML("beforeend", style)
   },
 
   getTransitionValues(props) {
@@ -73,76 +80,79 @@ const ScrollAnimation = {
     if (props.duration) {
       duration = props.duration
     } else {
-      duration = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.duration !== 'undefined') ? AnimationOptions.duration : 0.6
+      duration = (typeof Options !== 'undefined' && typeof Options.duration !== 'undefined') ? Options.duration : 0.6
     }
 
     if (props.timing) {
       timing = props.timing
     } else {
-      timing = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.timing !== 'undefined') ? AnimationOptions.timing : 'ease'
+      timing = (typeof Options !== 'undefined' && typeof Options.timing !== 'undefined') ? Options.timing : 'ease'
     }
 
     if (props.delay) {
       delay = props.delay
     } else {
-      delay = (typeof AnimationOptions !== 'undefined' && typeof AnimationOptions.delay !== 'undefined') ? AnimationOptions.delay : 0
+      delay = (typeof Options !== 'undefined' && typeof Options.delay !== 'undefined') ? Options.delay : 0
     }
 
     return { duration, timing, delay }
   },
 
-  initialStyle(style, initial, selector) {
+  initialStyle(initial, selector) {
     let transitions = ''
-    style.insertAdjacentHTML("beforeend", `${selector} {`)
+    this.setStyle(`${selector} {`)
 
     for (let [index, props] of initial.entries()) {
-      const prop = Object.keys(props)[0]
+      const property = Object.keys(props)[0]
       const value = props[Object.keys(props)[0]]
-
       const { duration, timing, delay } = this.getTransitionValues(props)
 
-      style.insertAdjacentHTML("beforeend", `  ${prop}: ${value};`)
-
       if (index === initial.length - 1) {
-        transitions += `${prop} ${duration}s ${timing} ${delay}s;`
-        style.insertAdjacentHTML("beforeend", `  transition: ${transitions}`)
+        transitions += `${property} ${duration}s ${timing} ${delay}s`
       } else {
-        transitions += `${prop} ${duration}s ${timing} ${delay}s, `
+        transitions += `${property} ${duration}s ${timing} ${delay}s, `
       }
+
+      this.setStyle(`  ${property}: ${value};`)
     }
 
-    style.insertAdjacentHTML("beforeend", `}
-    `)
+    this.setStyle(`  transition: ${transitions}; \n}\n\n`)
   },
 
-  finalStyle(style, final, selector) {
-    style.insertAdjacentHTML("beforeend", `${selector}.animate {`)
+  finalStyle(final, selector) {
+    this.setStyle(`${selector}.animate {`)
 
     for (let props of final) {
       const prop = Object.keys(props)[0]
       const value = props[Object.keys(props)[0]]
-      style.insertAdjacentHTML("beforeend", `  ${prop}: ${value} !important;`)
+      this.setStyle(`  ${prop}: ${value} !important;`)
     }
 
-    style.insertAdjacentHTML("beforeend", `}
-    `)
+    this.setStyle(`}\n\n`)
+  },
+
+  getTriggerOptions() {
+    const desktop = (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
+    const mobile = (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
+    const remake = (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') ? Options.remake : true
+
+    return `{"desktop": ${desktop}, "mobile": ${mobile}, "remake": ${remake}}`
   },
 
   innerStyles() {
-    const style = document.querySelector("head style#easy-scroll-animation")
     let selectors = ''
 
     for (let [index, { selector, initial, final }] of Animations.entries()) {
-      const lastSelector = index === Animations.length - 1
-      selectors += lastSelector ? `${selector}` : `${selector} $ `
+      selectors += (index === Animations.length - 1) ? `${selector}` : `${selector} $ `
 
-      this.initialStyle(style, initial, selector)
+      this.initialStyle(initial, selector)
       if (final !== undefined && final.length !== 0) {
-        this.finalStyle(style, final, selector)
+        this.finalStyle(final, selector)
       }
     }
 
-    style.insertAdjacentHTML("beforeend", `/* ${selectors} */`)
+    const json = this.getTriggerOptions()
+    this.setStyle(`/* ${selectors} ||| ${json} */`)
   },
 
   start() {

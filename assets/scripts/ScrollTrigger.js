@@ -1,45 +1,36 @@
-/**
- * ==== DEFAULT TRIGGER OPTIONS ====
- * desktop: 70   (screen height percentage)
- * mobile: 80   (screen height percentage)
- * remake: true   (repetition of the animation on going up and down again )
- */
-
-const TriggerOptions = {}
-
 const ScrollTrigger = {
   nodes: [],
 
-  getNodes() {
-    const styleEl = document.querySelector('head style#easy-scroll-animation')
-    const CSSCodeString = styleEl.innerText
-
-    const selectors = CSSCodeString.substring(
-      CSSCodeString.indexOf("/*") + 2,
-      CSSCodeString.lastIndexOf("*/")
-    ).split('$')
-
+  setNodes(selectors) {
     for (let selector of selectors) {
       const nodeList = document.querySelectorAll(selector.trim())
       nodeList.forEach(node => this.nodes.push(node))
     }
   },
 
-  screenPercentage() {
-    if (window.innerWidth > 480) {
-      return (typeof TriggerOptions !== 'undefined' && typeof TriggerOptions.desktop !== 'undefined') ? TriggerOptions.desktop : 70
-    } else {
-      return (typeof TriggerOptions !== 'undefined' && typeof TriggerOptions.mobile !== 'undefined') ? TriggerOptions.mobile : 80
-    }
+  getSelectorsAndOptions() {
+    const styleEl = document.querySelector('head style#easy-scroll-animation')
+    const cssInString = styleEl.innerText
+
+    return cssInString.substring(
+      cssInString.indexOf("/*") + 2,
+      cssInString.lastIndexOf("*/")
+    ).split('|||')
   },
 
-  animationRemake() {
-    return (typeof TriggerOptions !== 'undefined' && typeof TriggerOptions.remake !== 'undefined') ? TriggerOptions.remake : true
+  setNodesAndOptions() {
+    const [selectors, options] = this.getSelectorsAndOptions()
+
+    this.setNodes(selectors.split('$'))
+    this.options = JSON.parse(options)
+  },
+
+  getScreenPercentage() {
+    return window.innerWidth > 480 ? this.options.desktop : this.options.mobile
   },
 
   checkNodes() {
-    const percentage = this.screenPercentage()
-    const remake = this.animationRemake()
+    const percentage = this.getScreenPercentage()
     const trigger = window.innerHeight * percentage / 100
 
     for (let node of this.nodes) {
@@ -47,14 +38,14 @@ const ScrollTrigger = {
 
       if (elTop < trigger) {
         node.classList.add('animate')
-      } else if (remake) {
+      } else if (this.options.remake) {
         node.classList.remove('animate')
       }
     }
   },
 
   start() {
-    this.getNodes()
+    this.setNodesAndOptions()
     this.checkNodes()
     window.onscroll = () => this.checkNodes()
   }
