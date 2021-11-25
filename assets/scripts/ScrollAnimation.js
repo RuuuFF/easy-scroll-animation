@@ -98,6 +98,14 @@ const ScrollAnimation = {
     return { duration, timing, delay }
   },
 
+  getTriggerOptionsInJSON() {
+    const desktop = (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
+    const mobile = (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
+    const remake = (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') ? Options.remake : true
+
+    return `{"desktop": ${desktop}, "mobile": ${mobile}, "remake": ${remake}}`
+  },
+
   initialStyle(initial, selector) {
     let transitions = ''
     this.setStyle(`${selector} {`)
@@ -125,18 +133,11 @@ const ScrollAnimation = {
     for (let props of final) {
       const prop = Object.keys(props)[0]
       const value = props[Object.keys(props)[0]]
-      this.setStyle(`  ${prop}: ${value} !important;`)
+
+      this.setStyle(`  ${prop}: ${value};`)
     }
 
     this.setStyle(`}\n\n`)
-  },
-
-  getTriggerOptions() {
-    const desktop = (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
-    const mobile = (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
-    const remake = (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') ? Options.remake : true
-
-    return `{"desktop": ${desktop}, "mobile": ${mobile}, "remake": ${remake}}`
   },
 
   innerStyles() {
@@ -151,7 +152,7 @@ const ScrollAnimation = {
       }
     }
 
-    const json = this.getTriggerOptions()
+    const json = this.getTriggerOptionsInJSON()
     this.setStyle(`/* ${selectors} ||| ${json} */`)
   },
 
