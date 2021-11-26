@@ -146,7 +146,10 @@ const ScrollAnimation = {
     for (let [index, { selector, initial, final }] of Animations.entries()) {
       selectors += (index === Animations.length - 1) ? `${selector}` : `${selector} $ `
 
-      this.initialStyle(initial, selector)
+      if (initial !== undefined && initial.length !== 0) {
+        this.initialStyle(initial, selector)
+      }
+
       if (final !== undefined && final.length !== 0) {
         this.finalStyle(final, selector)
       }
