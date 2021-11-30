@@ -1,36 +1,38 @@
 const ScrollTrigger = {
   nodes: [],
 
-  setNodes(selectors) {
-    for (let selector of selectors) {
-      const nodeList = document.querySelectorAll(selector.trim())
+  setNodes() {
+    for (let { selector } of Animations) {
+      const nodeList = document.querySelectorAll(selector)
       nodeList.forEach(node => this.nodes.push(node))
     }
   },
 
-  getSelectorsAndOptions() {
-    const styleEl = document.querySelector('head style#easy-scroll-animation')
-    const cssInString = styleEl.innerText
+  getScreenPercentage: (desktop, mobile) => window.innerWidth > 480 ? desktop : mobile,
 
-    return cssInString.substring(
-      cssInString.indexOf("/*") + 2,
-      cssInString.lastIndexOf("*/")
-    ).split('|||')
-  },
+  getTriggerOptions() {
+    const haveOptions = typeof AnimationOptions !== 'undefined'
+    let desktop, mobile, remake;
 
-  setNodesAndOptions() {
-    const [selectors, options] = this.getSelectorsAndOptions()
+    if (haveOptions) {
+      AnimationOptions?.desktop ? desktop = AnimationOptions.desktop : ''
+      AnimationOptions?.mobile ? mobile = AnimationOptions.mobile : ''
 
-    this.setNodes(selectors.split('$'))
-    this.options = JSON.parse(options)
-  },
+      if (AnimationOptions?.remake || !AnimationOptions?.remake) {
+        remake = AnimationOptions.remake
+      }
+    }
 
-  getScreenPercentage() {
-    return window.innerWidth > 480 ? this.options.desktop : this.options.mobile
+    desktop === undefined ? desktop = 70 : ''
+    mobile === undefined ? mobile = 80 : ''
+    remake === undefined ? remake = true : ''
+
+    return { desktop, mobile, remake }
   },
 
   checkNodes() {
-    const percentage = this.getScreenPercentage()
+    const { desktop, mobile, remake } = this.getTriggerOptions()
+    const percentage = this.getScreenPercentage(desktop, mobile)
     const trigger = window.innerHeight * percentage / 100
 
     for (let node of this.nodes) {
@@ -38,14 +40,14 @@ const ScrollTrigger = {
 
       if (elTop < trigger) {
         node.classList.add('animate')
-      } else if (this.options.remake) {
+      } else if (remake) {
         node.classList.remove('animate')
       }
     }
   },
 
   start() {
-    this.setNodesAndOptions()
+    this.setNodes()
     this.checkNodes()
     window.onscroll = () => this.checkNodes()
   }

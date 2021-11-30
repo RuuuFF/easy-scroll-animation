@@ -10,7 +10,7 @@
  * Use :is() for multiple selectors with the same animation
  */
 
-const Options = {}
+const AnimationOptions = {}  // Can be erased
 
 const Animations = [
   {
@@ -75,35 +75,28 @@ const ScrollAnimation = {
   },
 
   getTransitionValues(props) {
+    const haveOptions = typeof AnimationOptions !== 'undefined'
     let duration, timing, delay;
 
     if (props.duration) {
       duration = props.duration
-    } else {
-      duration = (typeof Options !== 'undefined' && typeof Options.duration !== 'undefined') ? Options.duration : 0.6
+    } else if (haveOptions && AnimationOptions?.duration) {
+      duration = AnimationOptions.duration
     }
 
     if (props.timing) {
       timing = props.timing
-    } else {
-      timing = (typeof Options !== 'undefined' && typeof Options.timing !== 'undefined') ? Options.timing : 'ease'
+    } else if (haveOptions && AnimationOptions?.timing) {
+      timing = AnimationOptions.timing
     }
 
     if (props.delay) {
       delay = props.delay
-    } else {
-      delay = (typeof Options !== 'undefined' && typeof Options.delay !== 'undefined') ? Options.delay : 0
+    } else if (haveOptions && AnimationOptions?.delay) {
+      delay = AnimationOptions.delay
     }
 
     return { duration, timing, delay }
-  },
-
-  getTriggerOptionsInJSON() {
-    const desktop = (typeof Options !== 'undefined' && typeof Options.desktop !== 'undefined') ? Options.desktop : 70
-    const mobile = (typeof Options !== 'undefined' && typeof Options.mobile !== 'undefined') ? Options.mobile : 80
-    const remake = (typeof Options !== 'undefined' && typeof Options.remake !== 'undefined') ? Options.remake : true
-
-    return `{"desktop": ${desktop}, "mobile": ${mobile}, "remake": ${remake}}`
   },
 
   initialStyle(initial, selector) {
@@ -113,7 +106,7 @@ const ScrollAnimation = {
     for (let [index, props] of initial.entries()) {
       const property = Object.keys(props)[0]
       const value = props[Object.keys(props)[0]]
-      const { duration, timing, delay } = this.getTransitionValues(props)
+      const { duration = 0.6, timing = 'ease', delay = 0 } = this.getTransitionValues(props)
 
       if (index === initial.length - 1) {
         transitions += `${property} ${duration}s ${timing} ${delay}s`
@@ -127,7 +120,7 @@ const ScrollAnimation = {
     this.setStyle(`  transition: ${transitions}; \n}\n\n`)
   },
 
-  finalStyle(final, selector) {
+  finalStyle(final, selector, index) {
     this.setStyle(`${selector}.animate {`)
 
     for (let props of final) {
@@ -137,26 +130,17 @@ const ScrollAnimation = {
       this.setStyle(`  ${prop}: ${value};`)
     }
 
-    this.setStyle(`}\n\n`)
+    this.setStyle(index === Animations.length - 1 ? `}` : `}\n\n`)
   },
 
   innerStyles() {
-    let selectors = ''
-
     for (let [index, { selector, initial, final }] of Animations.entries()) {
-      selectors += (index === Animations.length - 1) ? `${selector}` : `${selector} $ `
+      const haveInitial = initial !== 'undefined' && initial.length !== 0
+      const haveFinal = final !== 'undefined' && final.length !== 0
 
-      if (initial !== undefined && initial.length !== 0) {
-        this.initialStyle(initial, selector)
-      }
-
-      if (final !== undefined && final.length !== 0) {
-        this.finalStyle(final, selector)
-      }
+      haveInitial ? this.initialStyle(initial, selector) : ''
+      haveFinal ? this.finalStyle(final, selector, index) : ''
     }
-
-    const json = this.getTriggerOptionsInJSON()
-    this.setStyle(`/* ${selectors} ||| ${json} */`)
   },
 
   start() {
