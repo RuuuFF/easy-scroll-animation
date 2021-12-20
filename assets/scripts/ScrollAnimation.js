@@ -15,49 +15,33 @@ const AnimationOptions = {}  // Can be erased
 const Animations = [
   {
     selector: 'h1',
-    initial: [
-      { opacity: 0, duration: 0.8 },
-      { transform: 'scale(0.8)', duration: 0.8 },
-    ],
-    final: [
-      { opacity: 1 },
-      { transform: 'scale(1)' },
+    styles: [
+      { opacity: [0, 1], duration: 0.8 },
+      { transform: ['scale(0.8)', 'scale(1)'], duration: 0.8 },
     ]
   },
 
   {
     selector: '.box:is(.one, .three, .five, .seven)',
-    initial: [
-      { opacity: 0, timing: 'linear' },
-      { transform: 'translate(-40px, 40px)', timing: 'ease-in' },
-    ],
-    final: [
-      { opacity: 1 },
-      { transform: 'translate(0, 0)' },
+    styles: [
+      { opacity: [0, 1], timing: 'linear' },
+      { transform: ['translate(-40px, 40px)', 'translate(0, 0)'], timing: 'ease-in' },
     ]
   },
 
   {
     selector: '.box:is(.two, .four, .six, .eight)',
-    initial: [
-      { opacity: 0, timing: 'linear' },
-      { transform: 'translate(40px, 40px)', timing: 'ease-out' },
-    ],
-    final: [
-      { opacity: 1 },
-      { transform: 'translate(0, 0)' },
+    styles: [
+      { opacity: [0, 1], timing: 'linear' },
+      { transform: ['translate(40px, 40px)', 'translate(0, 0)'], timing: 'ease-out' },
     ]
   },
 
   {
     selector: '.box:is(.nine, .ten)',
-    initial: [
-      { opacity: 0, duration: 0.8 },
-      { transform: 'translate(0, 50px) scaleX(0.5)', duration: 0.8 },
-    ],
-    final: [
-      { opacity: 1 },
-      { transform: 'translate(0, 0) scaleX(1)' },
+    styles: [
+      { opacity: [0, 1], duration: 0.8 },
+      { transform: ['translate(0, 50px) scaleX(0.5)', 'translate(0, 0) scaleX(1)'], duration: 0.8 },
     ]
   },
 ]
@@ -99,16 +83,17 @@ const ScrollAnimation = {
     return { duration, timing, delay }
   },
 
-  initialStyle(initial, selector) {
+  initialStyle(styles, selector) {
     let transitions = ''
     this.setStyle(`${selector} {`)
 
-    for (let [index, props] of initial.entries()) {
-      const property = Object.keys(props)[0]
-      const value = props[Object.keys(props)[0]]
+    for (let [index, props] of styles.entries()) {
+      const [property, values] = Object.entries(props)[0]
+      const value = values[0]
+
       const { duration = 0.6, timing = 'ease', delay = 0 } = this.getTransitionValues(props)
 
-      if (index === initial.length - 1) {
+      if (index === styles.length - 1) {
         transitions += `${property} ${duration}s ${timing} ${delay}s`
       } else {
         transitions += `${property} ${duration}s ${timing} ${delay}s, `
@@ -120,26 +105,25 @@ const ScrollAnimation = {
     this.setStyle(`  transition: ${transitions}; \n}\n\n`)
   },
 
-  finalStyle(final, selector, index) {
+  finalStyle(styles, selector, index) {
     this.setStyle(`${selector}.animate {`)
 
-    for (let props of final) {
-      const prop = Object.keys(props)[0]
-      const value = props[Object.keys(props)[0]]
+    for (let props of styles) {
+      const [property, values] = Object.entries(props)[0]
+      const value = values[1]
 
-      this.setStyle(`  ${prop}: ${value};`)
+      this.setStyle(`  ${property}: ${value};`)
     }
 
     this.setStyle(index === Animations.length - 1 ? `}` : `}\n\n`)
   },
 
   innerStyles() {
-    for (let [index, { selector, initial, final }] of Animations.entries()) {
-      const haveInitial = initial !== 'undefined' && initial.length !== 0
-      const haveFinal = final !== 'undefined' && final.length !== 0
+    for (let [index, { selector, styles }] of Animations.entries()) {
+      const haveStyles = typeof styles !== 'undefined'
 
-      haveInitial ? this.initialStyle(initial, selector) : ''
-      haveFinal ? this.finalStyle(final, selector, index) : ''
+      haveStyles ? this.initialStyle(styles, selector) : ''
+      haveStyles ? this.finalStyle(styles, selector, index) : ''
     }
   },
 
